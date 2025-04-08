@@ -1,0 +1,81 @@
+<%- include("navbar") %>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">My Book Collection</h1>
+    
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <% if (books && books.length > 0) { %>
+            <% books.forEach(book => { %>
+                <div class="col">
+                    <div class="card h-100 book-card">
+                        <% if (book.coverId) { %>
+                            <img src="<%= book.coverId %>" class="card-img-top" alt="<%= book.title %>">
+                        <% } else { %>
+                            <div class="no-cover">
+                                <i class="fas fa-book fa-3x"></i>
+                            </div>
+                        <% } %>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= book.title %></h5>
+                            <p class="card-text">
+                                <small class="text-muted">By <%= book.author %></small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">Published: <%= book.year %></small>
+                            </p>
+                            <% if (book.summary) { %>
+                                <p class="card-text summary"><%= book.summary.substring(0, 150) %>...</p>
+                            <% } %>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-sm">View Notes</button>
+                            <button class="btn btn-outline-danger btn-sm ms-2">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    <p>No books in your collection yet. Start by searching and adding books!</p>
+                    <a href="/" class="btn btn-primary">Search Books</a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<style>
+    .book-card {
+        transition: transform 0.2s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-img-top {
+        height: 300px;
+        object-fit: cover;
+    }
+    
+    .no-cover {
+        height: 300px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+    }
+    
+    .summary {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .card-footer {
+        background-color: white;
+        border-top: none;
+    }
+</style>
