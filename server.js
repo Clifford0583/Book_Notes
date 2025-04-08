@@ -30,18 +30,12 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/books", async (req, res) => {
-  try {
-    const result = await db.query("SELECT * FROM books");
-    res.send(result.rows);
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    res.status(500).json({ error: "Failed to fetch books" });
-  }
+  // Render all the books added to the database
+  res.render("books.ejs");
 });
 
 app.get("/search", async (req, res) => {
-  // search books
-  //const searchBooks = req.body.search;
+  // search route for searching books to the api
   const query = req.query.search_input;
   if (!query) {
     return res.status(400).json({ error: "Search query is required" });
@@ -53,23 +47,44 @@ app.get("/search", async (req, res) => {
     )}`;
     const result = await axios.get(url);
 
-    const books = result.data.docs.map((book) => ({
-      title: book.title,
-      author: book.author_name ? book.author_name[0] : "Unknown Author",
-      year: book.first_publish_year || "Unknown Year",
-      edition: book.edition_count,
-      coverId: book.cover_i
-        ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
-        : null,
-      key: book.key,
-    }));
+    const books = result.data.docs.map(async (book) => {
+      //map book the data to the required format
+      let summary = null;
+      if (book.key) {
+        try {
+          const workUrl = `https://openlibrary.org${book.key}.json`;
+          const workResponse = await axios.get(workUrl);
+          if (workResponse.data.description) {
+            summary =
+              typeof workResponse.data.description === "string"
+                ? workResponse.data.description
+                : workResponse.data.description.value;
+          }
+        } catch (error) {
+          console.error("Error fetching work details:", error);
+        }
+      }
+      return {
+        title: book.title,
+        author: book.author_name ? book.author_name[0] : "Unknown Author",
+        year: book.first_publish_year || "Unknown Year",
+        edition: book.edition_count,
+        coverId: book.cover_i
+          ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+          : null,
+        summary: summary,
+      };
+    });
 
-    res.render("index.ejs", { books, result, error: null });
+    const resolvedBooks = await Promise.all(books);
+    res.render("index.ejs", { books: resolvedBooks, result, error: null });
   } catch (error) {
     console.error("Error searching books:", error);
     res.render("index.ejs", { books: null, error: "Failed to search books" });
   }
 });
+
+app.post("/addBook", async (req, res) => {});
 
 app.listen(port, () => {
   console.log("Server is running on port 3000");
