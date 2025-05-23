@@ -5,31 +5,39 @@
     
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
         <% if (books && books.length > 0) { %>
-            <% books.forEach(book => { %>
+            <% books.forEach(book => { %> 
                 <div class="col">
                     <div class="card h-100 book-card">
-                        <% if (book.coverId) { %>
-                            <img src="<%= book.coverId %>" class="card-img-top" alt="<%= book.title %>">
+                        <% if (book.cover) { %>
+                            <img src="<%= book.cover %>" class="card-img-top" alt="<%= book.book_title %>">
                         <% } else { %>
                             <div class="no-cover">
                                 <i class="fas fa-book fa-3x"></i>
                             </div>
                         <% } %>
                         <div class="card-body">
-                            <h5 class="card-title"><%= book.title %></h5>
+                            <h5 class="card-title"><%= book.book_title %></h5>
                             <p class="card-text">
                                 <small class="text-muted">By <%= book.author %></small>
                             </p>
                             <p class="card-text">
-                                <small class="text-muted">Published: <%= book.year %></small>
+                                <small class="text-muted">Published: <%= book.book_year %></small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">Edition: <%= book.edition %></small>
+                            </p>
+                            <p class="card-text">
+                                <small class="text-muted">ID <%= book.id %></small>
                             </p>
                             <% if (book.summary) { %>
                                 <p class="card-text summary"><%= book.summary.substring(0, 150) %>...</p>
                             <% } %>
                         </div>
                         <div class="card-footer">
-                            <button class="btn btn-primary btn-sm">View Notes</button>
-                            <button class="btn btn-outline-danger btn-sm ms-2">Remove</button>
+                            <form method="post">
+                                <button class="btn btn-primary btn-sm">View Notes</button>
+                                <input type="submit" value="Remove" formaction="/deleteBook" class="btn btn-outline-danger btn-sm ms-2">
+                            </form>
                         </div>
                     </div>
                 </div>
